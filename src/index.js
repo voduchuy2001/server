@@ -13,5 +13,5 @@ let port = process.env.PORT || 6969;
 initAPIRoutes(app);
 
 app.listen(port, () => {
-    console.log('Server is running on port: ' + port);
+    console.log('Server is running on [http://localhost:' + port + ']');
 })
