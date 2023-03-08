@@ -7,7 +7,7 @@ let router = express.Router();
 
 let initAPIRoutes = (app) => {
     router.post('/register', validate([
-        body('email').notEmpty().withMessage('Email is required!').isEmail().withMessage('Wrong email type!'),
+        body('email').notEmpty().withMessage('Email is required!').isEmail().withMessage('Email format wrong!'),
         body('password').notEmpty().withMessage('Password is required!').isLength({ min: 6 }).withMessage('Password min 6 characters'),
         body('firstName').notEmpty().withMessage('First name is required'),
         body('lastName').notEmpty().withMessage('Last name is required')
