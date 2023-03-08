@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
 import db from '../../models/index'
 
-let saltRounds = 10
+const saltRounds = 10
 
-let hashPassword = (userPassword) => {
+const hashPassword = (userPassword) => {
     return new Promise(async (resolve, reject) => {
         try {
             await bcrypt.genSalt(saltRounds, function (err, salt) {
@@ -17,7 +17,7 @@ let hashPassword = (userPassword) => {
     })
 }
 
-let emailExits = (userEmail) => {
+const emailExits = (userEmail) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await db.User.findOne({ where: { email: userEmail } });
