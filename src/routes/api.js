@@ -20,7 +20,8 @@ let initAPIRoutes = (app) => {
     ]), authController.login)
 
     router.get('/auth-user', verifyAccessToken, authController.authUser);
-
+    router.post('/refresh-token', authController.refreshAccessToken)
+    router.post('/logout', authController.logout)
 
     return app.use('/api', router);
 };
