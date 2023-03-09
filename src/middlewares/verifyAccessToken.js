@@ -4,7 +4,7 @@ const verifyAccessToken = (req, res, next) => {
     try {
         if (req?.headers?.authorization?.startsWith('Bearer')) {
             const token = req.headers.authorization.split(' ')[1]
-            jwt.verify(token, process.env.JWT_SECRET, (err, decode) => {
+            jwt.verify(token, process.env.ACCESS_TOKEN, (err, decode) => {
                 if (err) {
                     return res.status(400).json({
                         msg: 'Invalid access token!'

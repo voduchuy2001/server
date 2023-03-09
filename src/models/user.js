@@ -24,7 +24,6 @@ module.exports = (sequelize, DataTypes) => {
     wishListId: DataTypes.INTEGER,
     cartId: DataTypes.INTEGER,
     isBlocked: DataTypes.BOOLEAN,
-    refreshToken: DataTypes.STRING,
     passwordChangeAt: DataTypes.STRING,
     passwordResetToken: DataTypes.STRING,
     passwordResetExpires: DataTypes.STRING

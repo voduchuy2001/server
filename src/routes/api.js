@@ -1,7 +1,7 @@
 import express from "express";
 import authController from "../controllers/authController"
 import { validate } from "../middlewares/validate";
-import verifyAccessToken from "../middlewares/verifyToken"
+import verifyAccessToken from "../middlewares/verifyAccessToken"
 import { body } from "express-validator";
 
 let router = express.Router();
@@ -20,7 +20,7 @@ let initAPIRoutes = (app) => {
     ]), authController.login)
 
     router.get('/auth-user', verifyAccessToken, authController.authUser);
-    router.post('/refresh-token', authController.refreshAccessToken)
+    router.post('/refresh-token', authController.refreshToken)
     router.post('/logout', authController.logout)
 
     return app.use('/api', router);

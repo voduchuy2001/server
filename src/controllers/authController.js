@@ -1,7 +1,7 @@
 import db from "../models/index"
 import handleResgiter from "../services/auth/handleRegister"
 import handleLogin from "../services/auth/handleLogin"
-import { generateAccessToken, generateRefreshToken } from "../services/auth/jwt"
+import { generateAccessToken, generateRefreshToken } from "../services/auth/handleJwt"
 import jwt from "jsonwebtoken"
 
 const register = async (req, res) => {
@@ -40,15 +40,11 @@ const login = async (req, res) => {
             })
         } else {
             const accessToken = generateAccessToken(user.id, user.role)
-            const newToken = generateRefreshToken(user.id)
-
-            await db.User.update({ refreshToken: newToken }, {
-                where: {
-                    id: user.id
-                }
+            const refreshToken = generateRefreshToken(user.id, user.role)
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                maxAge: 7 * 24 * 60 * 60 * 1000
             })
-
-            res.cookie('refreshToken', newToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
             return res.status(200).json({
                 accessToken,
                 msg: 'Login successfully!',
@@ -64,7 +60,7 @@ const login = async (req, res) => {
 
 const authUser = async (req, res) => {
     try {
-        const user = await db.User.findByPk(req.user.id, { attributes: ['refreshToken', 'password', 'role'] })
+        const user = await db.User.findByPk(req.user.id, { attributes: ['email', 'password', 'role'] })
         if (!user) {
             return res.status(400).json({
                 msg: 'User not found!'
@@ -82,29 +78,26 @@ const authUser = async (req, res) => {
     }
 }
 
-const refreshAccessToken = async (req, res) => {
+const refreshToken = async (req, res) => {
     try {
         const cookie = req.cookies
-        if (!cookie || !cookie.refreshToken) {
+        if (!cookie.refreshToken) {
             return res.status(400).json({
                 msg: 'Do not have refresh token in cookie!'
             })
         } else {
-            const userData = await jwt.verify(cookie.refreshToken, process.env.JWT_SECRET)
-            const user = await db.User.findOne({
-                where: { id: userData.id, refreshToken: cookie.refreshToken }
+            await jwt.verify(cookie.refreshToken, process.env.REFRESH_TOKEN, (err, decode) => {
+                if (err) {
+                    return res.status(400).json({
+                        msg: 'Invalid refresh token!'
+                    })
+                } else {
+                    const newAccessToken = generateAccessToken(decode.id, decode.role)
+                    return res.status(200).json({
+                        accessToken: newAccessToken
+                    })
+                }
             })
-
-            if (!user) {
-                return res.status(400).json({
-                    msg: 'Refresh token does not match!'
-                })
-            } else {
-                const newAccessToken = generateAccessToken(userData.id, userData.role)
-                return res.status(200).json({
-                    newAccessToken: newAccessToken
-                })
-            }
         }
     } catch (error) {
         return res.status(500).json({
@@ -116,18 +109,11 @@ const refreshAccessToken = async (req, res) => {
 const logout = async (req, res) => {
     try {
         const cookie = req.cookies
-        if (!cookie || !cookie.refreshToken) {
+        if (!cookie.refreshToken) {
             return res.status(400).json({
                 msg: 'Do not have refresh token in cookie!'
             })
         } else {
-            // const user = await db.User.findOne({ where: { refreshToken: cookie.refreshToken } })
-            // await db.User.update({ refreshToken: '' }, {
-            //     where: {
-            //         id: user.id
-            //     }
-            // })
-
             res.clearCookie('refreshToken', {
                 httpOnly: true,
                 secure: true
@@ -147,6 +133,6 @@ module.exports = {
     register,
     login,
     authUser,
-    refreshAccessToken,
+    refreshToken,
     logout,
 }

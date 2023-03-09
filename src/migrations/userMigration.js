@@ -44,9 +44,6 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         default: false,
       },
-      refreshToken: {
-        type: Sequelize.STRING
-      },
       passwordChangeAt: {
         type: Sequelize.STRING
       },
