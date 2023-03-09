@@ -24,4 +24,24 @@ const verifyAccessToken = (req, res, next) => {
     }
 }
 
-module.exports = verifyAccessToken
+const admin = (req, res, next) => {
+    try {
+        const { role } = req.user
+        
+        if (role !== 'admin') {
+            return res.status(401).json({
+                msg: 'Access denied!'
+            })
+        } else {
+            next()
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+module.exports = {
+    verifyAccessToken,
+    admin
+}

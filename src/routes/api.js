@@ -1,7 +1,7 @@
 import express from "express";
 import authController from "../controllers/authController"
 import { validate } from "../middlewares/validate";
-import verifyAccessToken from "../middlewares/verifyToken"
+import { verifyAccessToken } from "../middlewares/verifyToken"
 import { body } from "express-validator";
 
 let router = express.Router();
