@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     isBlocked: DataTypes.BOOLEAN,
     passwordChangeAt: DataTypes.STRING,
     passwordResetToken: DataTypes.STRING,
-    passwordResetExpires: DataTypes.STRING
+    passwordResetExpired: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User',

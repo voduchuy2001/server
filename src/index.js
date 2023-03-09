@@ -13,6 +13,12 @@ app.use(cookieParser());
 let port = process.env.PORT || 6969;
 
 initAPIRoutes(app);
+app.use((req, res) => {
+    return res.status(404).json({
+        msg: '404 Page not found!'
+    });
+});
+
 
 app.listen(port, () => {
     console.log('Server is running on [http://localhost:' + port + ']');

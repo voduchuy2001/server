@@ -1,7 +1,11 @@
 import db from "../models/index"
+const { Op } = require('sequelize')
 import handleResgiter from "../services/auth/handleRegister"
 import handleLogin from "../services/auth/handleLogin"
+import handleResetPassword from "../services/auth/handleResetPassword"
 import { generateAccessToken, generateRefreshToken } from "../services/auth/handleJwt"
+import sendMail from "../services/auth/handleMail"
+const crypto = require('crypto')
 import jwt from "jsonwebtoken"
 
 const register = async (req, res) => {
@@ -129,10 +133,91 @@ const logout = async (req, res) => {
     }
 }
 
+const forgotPassword = async (req, res) => {
+    try {
+        const user = await db.User.findOne({
+            where: { email: req.body.email }
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                msg: 'These credentials do not match our records!'
+            })
+        } else {
+            const resetToken = crypto.randomBytes(32).toString('hex')
+            await user.update({
+                passwordResetToken: crypto.createHash('sha256').update(resetToken).digest('hex'),
+                passwordResetExpired: Date.now() + 15 * 60 * 1000
+            });
+            const emailTemplate = `You are receiving this email because we received a password reset request for your account.This password reset link will expire in 15 minutes. 
+            <a href=${process.env.URL_SERVER}/api/reset-password/${resetToken}>Click here</a>`
+
+            const data = {
+                email: user.email,
+                html: emailTemplate,
+            }
+
+            const sendingMail = await sendMail(data);
+            if (!sendingMail) {
+                return res.status(400).json({
+                    msg: 'Mailing fail!'
+                })
+            } else {
+                console.log(sendingMail)
+                return res.status(200).json({
+                    msg: 'A confirmation email has been sent to your email'
+                })
+            }
+        }
+    } catch (error) {
+        return res.status(500).json({
+            msg: '500 Server ' + error
+        })
+    }
+}
+
+const resetPassword = async (req, res) => {
+    try {
+        const { password, resetToken } = req.body
+        const passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+        
+        const user = await db.User.findOne({
+            where: {
+                passwordResetToken: passwordResetToken,
+                passwordResetExpired: {
+                    [Op.gte]: Date.now()
+                },
+            }
+        })
+
+        if (!user) {
+            return res.status(400).json({
+                msg: 'Not found data!'
+            })
+        } else {
+            user.password = await handleResetPassword.hashPassword(password)
+            user.passwordResetToken = null
+            user.passwordChangeAt = Date.now()
+            user.passwordResetExpired = null
+            await user.save()
+            return res.status(200).json({
+                msg: 'Update password successfully!'
+            })
+        }
+
+    } catch (error) {
+        return res.status(500).json({
+            msg: '500 Server ' + error
+        })
+    }
+}
+
 module.exports = {
     register,
     login,
     authUser,
     refreshToken,
     logout,
+    forgotPassword,
+    resetPassword,
 }

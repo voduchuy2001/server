@@ -50,7 +50,7 @@ module.exports = {
       passwordResetToken: {
         type: Sequelize.STRING
       },
-      passwordResetExpires: {
+      passwordResetExpired: {
         type: Sequelize.STRING
       },
       createdAt: {
