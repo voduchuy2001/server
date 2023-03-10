@@ -32,13 +32,19 @@ let initAPIRoutes = (app) => {
 
     // Product
     router.post('/new-product', [verifyToken, admin, validate([
-        body('productName').notEmpty().withMessage('Name name is required'),
+        body('productName').notEmpty().withMessage('Name is required'),
+        body('productSlug').notEmpty().withMessage('Slug is required'),
         body('description').notEmpty().withMessage('Description is required'),
         body('originalPrice').notEmpty().withMessage('Original price is required'),
         body('sellingPrice').notEmpty().withMessage('Selling price is required'),
         body('stock').notEmpty().withMessage('Stock is required').isIn(['inStock', 'outStock']),
+        body('status').notEmpty().withMessage('Stock is required').isIn(['published', 'unPublished']),
         body('categoryId').notEmpty().withMessage('Category is required'),
     ])], productController.newProduct)
+    router.put('/update-product/:productId', [verifyToken, admin, validate([
+        body('stock').notEmpty().withMessage('Stock is required').isIn(['inStock', 'outStock']),
+        body('status').notEmpty().withMessage('Stock is required').isIn(['published', 'unPublished']),
+    ])], productController.updateProduct)
 
     return app.use('/api', router);
 };

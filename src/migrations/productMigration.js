@@ -24,6 +24,13 @@ module.exports = {
       sellingPrice: {
         type: Sequelize.STRING
       },
+      status: {
+        type: Sequelize.ENUM,
+        values: [
+          'published', 'unPublished'
+        ],
+        defaultValue: 'published',
+      },
       stock: {
         type: Sequelize.ENUM,
         values: [
