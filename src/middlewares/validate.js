@@ -7,12 +7,14 @@ const validate = (validations) => {
     const errors = validationResult(req);
     if (errors.isEmpty()) {
       return next();
+    } else {
+      res.status(400).json({
+        errors: errors.array()
+      });
     }
-
-    res.status(400).json({ errors: errors.array() });
   };
 };
 
 module.exports = {
-    validate
+  validate
 }

@@ -20,29 +20,29 @@ module.exports = {
         unique: true,
       },
       mobile: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      address: {
+        type: Sequelize.TEXT,
+        allowNull: true,
       },
       password: {
         type: Sequelize.STRING
       },
-      addressId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      wishListId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       role: {
-        type: Sequelize.STRING
-      },
-      cartId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
+        type: Sequelize.ENUM,
+        values: [
+          'admin', 'user'
+        ],
+        defaultValue: 'user',
       },
       isBlocked: {
-        type: Sequelize.BOOLEAN,
-        default: false,
+        type: Sequelize.ENUM,
+        values: [
+          'active', 'inActive'
+        ],
+        defaultValue: 'active',
       },
       passwordChangeAt: {
         type: Sequelize.STRING

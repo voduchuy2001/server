@@ -1,7 +1,8 @@
 import express from "express";
 import authController from "../controllers/authController"
+import productController from "../controllers/productController"
 import { validate } from "../middlewares/validate";
-import { verifyAccessToken } from "../middlewares/verifyToken"
+import { verifyToken, admin } from "../middlewares/verifyToken"
 import { body } from "express-validator";
 
 let router = express.Router();
@@ -18,7 +19,7 @@ let initAPIRoutes = (app) => {
         body('email').notEmpty().withMessage('Email is required!').isEmail().withMessage('Email format wrong!'),
         body('password').notEmpty().withMessage('Password is required!').isLength({ min: 6 }).withMessage('Password min 6 characters'),
     ]), authController.login)
-    router.get('/auth-user', verifyAccessToken, authController.authUser);
+    router.get('/auth-user', verifyToken, authController.authUser);
     router.post('/refresh-token', authController.refreshToken)
     router.post('/logout', authController.logout)
     router.post('/forgot-password', validate([
@@ -26,8 +27,18 @@ let initAPIRoutes = (app) => {
     ]), authController.forgotPassword)
     router.put('/reset-password', validate([
         body('password').notEmpty().withMessage('Password is required!').isLength({ min: 6 }).withMessage('Password min 6 characters'),
-        body('resetToken').notEmpty().withMessage('Token is required!')
+        body('token').notEmpty().withMessage('Token is required!')
     ]), authController.resetPassword)
+
+    // Product
+    router.post('/new-product', [verifyToken, admin, validate([
+        body('productName').notEmpty().withMessage('Name name is required'),
+        body('description').notEmpty().withMessage('Description is required'),
+        body('originalPrice').notEmpty().withMessage('Original price is required'),
+        body('sellingPrice').notEmpty().withMessage('Selling price is required'),
+        body('stock').notEmpty().withMessage('Stock is required').isIn(['inStock', 'outStock']),
+        body('categoryId').notEmpty().withMessage('Category is required'),
+    ])], productController.newProduct)
 
     return app.use('/api', router);
 };

@@ -1,10 +1,10 @@
 import db from "../models/index"
 const { Op } = require('sequelize')
-import handleResgiter from "../services/auth/handleRegister"
-import handleLogin from "../services/auth/handleLogin"
-import handleResetPassword from "../services/auth/handleResetPassword"
-import { generateAccessToken, generateRefreshToken } from "../services/auth/handleJwt"
-import sendMail from "../services/auth/handleMail"
+import handleResgiter from "../services/handleRegister"
+import handleLogin from "../services/handleLogin"
+import handleResetPassword from "../services/handleResetPassword"
+import { generateAccessToken, generateRefreshToken } from "../services/handleJwt"
+import sendMail from "../services/handleMail"
 const crypto = require('crypto')
 import jwt from "jsonwebtoken"
 
@@ -178,8 +178,8 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
     try {
-        const { password, resetToken } = req.body
-        const passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex')
+        const { password, token } = req.body
+        const passwordResetToken = crypto.createHash('sha256').update(token).digest('hex')
         
         const user = await db.User.findOne({
             where: {

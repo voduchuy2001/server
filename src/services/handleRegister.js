@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import db from '../../models/index'
+import db from '../models/index'
 
 const saltRounds = 10
 

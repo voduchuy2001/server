@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken"
 
-const verifyAccessToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
     try {
         if (req?.headers?.authorization?.startsWith('Bearer')) {
             const token = req.headers.authorization.split(' ')[1]
@@ -42,6 +42,6 @@ const admin = (req, res, next) => {
 }
 
 module.exports = {
-    verifyAccessToken,
+    verifyToken,
     admin
 }
