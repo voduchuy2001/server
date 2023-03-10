@@ -42,9 +42,11 @@ let initAPIRoutes = (app) => {
         body('categoryId').notEmpty().withMessage('Category is required'),
     ])], productController.newProduct)
     router.put('/update-product/:productId', [verifyToken, admin, validate([
-        body('stock').notEmpty().withMessage('Stock is required').isIn(['inStock', 'outStock']),
-        body('status').notEmpty().withMessage('Stock is required').isIn(['published', 'unPublished']),
+        body('stock').isIn(['inStock', 'outStock']),
+        body('status').isIn(['published', 'unPublished']),
     ])], productController.updateProduct)
+    router.get('/get-products', productController.getProducts)
+    router.delete('/delete-product/:productId', [verifyToken, admin], productController.deleteProduct)
 
     return app.use('/api', router);
 };
