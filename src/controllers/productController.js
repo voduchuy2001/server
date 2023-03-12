@@ -65,7 +65,54 @@ const updateProduct = async (req, res) => {
 }
 
 const getProducts = async (req, res) => {
-    return res.send("ok")
+    try {
+        const limit = parseInt(req.query.size) || 10
+        const offset = parseInt((req.query.page - 1) * limit) || 0
+
+        const { count, rows } = await db.Product.findAndCountAll({
+            offset: offset,
+            limit: limit,
+            order: [['createdAt', 'DESC']],
+        })
+
+        if (count <= 0) {
+            return res.status(400).json({
+                msg: 'Not found data',
+            })
+        } else {
+            return res.status(200).json({
+                msg: 'Products',
+                products: rows,
+                totalRecords: count,
+                perPage: limit,
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            msg: '500 Server ' + error
+        })
+    }
+}
+
+const getProduct = async (req, res) => {
+    try {
+        const product = await db.Product.findByPk(req.params.productId)
+
+        if (!product) {
+            return res.status(400).json({
+                msg: 'Not found data'
+            })
+        } else {
+            return res.status(200).json({
+                msg: 'Product',
+                product: product
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            msg: '500 Server ' + error
+        })
+    }
 }
 
 const deleteProduct = async (req, res) => {
@@ -80,7 +127,7 @@ const deleteProduct = async (req, res) => {
             product.destroy({
                 where: { id: productId }
             })
-            
+
             return res.status(200).json({
                 msg: 'Delete product success!'
             })
@@ -96,5 +143,6 @@ module.exports = {
     newProduct,
     updateProduct,
     getProducts,
+    getProduct,
     deleteProduct,
 }
